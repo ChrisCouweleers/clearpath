@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,6 +26,49 @@
     --green: #00B894;
     --radius: 16px;
     --radius-sm: 10px;
+    --select-bg: #1A2035;
+    --select-text: #E8ECF4;
+    --chart-legend: #7A839E;
+    --chart-tooltip-bg: #1A2035;
+    --chart-tooltip-border: rgba(255,255,255,0.1);
+    --chart-grid: rgba(255,255,255,0.04);
+    --chart-grid-faint: rgba(255,255,255,0.03);
+    --chart-tick: #4A5270;
+    --amort-highlight: rgba(108,92,231,0.06);
+    --hero-gradient-start: #fff;
+    --h1-gradient-start: #fff;
+    --scrollbar-track: #1A2035;
+    --scrollbar-thumb: #212842;
+  }
+
+  [data-theme="light"] {
+    --bg: #F4F6FB;
+    --surface: #FFFFFF;
+    --surface-2: #F0F2F8;
+    --surface-3: #E4E7F0;
+    --border: rgba(0,0,0,0.08);
+    --text: #1A1D2E;
+    --text-dim: #5A6178;
+    --text-muted: #8B91A8;
+    --accent: #6C5CE7;
+    --accent-glow: rgba(108,92,231,0.2);
+    --accent-2: #00B4AE;
+    --accent-3: #E8457A;
+    --accent-4: #E5A620;
+    --green: #00A884;
+    --select-bg: #FFFFFF;
+    --select-text: #1A1D2E;
+    --chart-legend: #5A6178;
+    --chart-tooltip-bg: #FFFFFF;
+    --chart-tooltip-border: rgba(0,0,0,0.1);
+    --chart-grid: rgba(0,0,0,0.06);
+    --chart-grid-faint: rgba(0,0,0,0.04);
+    --chart-tick: #8B91A8;
+    --amort-highlight: rgba(108,92,231,0.08);
+    --hero-gradient-start: #1A1D2E;
+    --h1-gradient-start: #1A1D2E;
+    --scrollbar-track: #F0F2F8;
+    --scrollbar-thumb: #D0D4E0;
   }
 
   body {
@@ -55,6 +98,14 @@
     background: radial-gradient(circle, rgba(0,206,201,0.06) 0%, transparent 60%);
     pointer-events: none; z-index: 0;
   }
+  [data-theme="light"] body::before,
+  [data-theme="light"]::before {
+    background: radial-gradient(circle, rgba(108,92,231,0.05) 0%, transparent 60%);
+  }
+  [data-theme="light"] body::after,
+  [data-theme="light"]::after {
+    background: radial-gradient(circle, rgba(0,206,201,0.04) 0%, transparent 60%);
+  }
 
   .app {
     position: relative; z-index: 1;
@@ -82,7 +133,7 @@
     font-family: 'Playfair Display', serif;
     font-size: clamp(28px, 6vw, 48px);
     font-weight: 700; letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+    background: linear-gradient(135deg, var(--h1-gradient-start) 30%, var(--accent) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .header p { color: var(--text-dim); font-size: 15px; margin-top: 6px; }
@@ -150,7 +201,7 @@
     background-position: right 14px center;
     padding-right: 36px;
   }
-  select option { background: #1A2035; color: #E8ECF4; }
+  select option { background: var(--select-bg); color: var(--select-text); }
 
   /* Form grid rows */
   .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -227,7 +278,7 @@
   .hero-amount {
     font-family: 'Playfair Display', serif;
     font-size: clamp(34px, 8vw, 54px); font-weight: 700;
-    background: linear-gradient(135deg, #fff 20%, var(--accent-2) 100%);
+    background: linear-gradient(135deg, var(--hero-gradient-start) 20%, var(--accent-2) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .hero-sub { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
@@ -318,8 +369,8 @@
     -webkit-overflow-scrolling: touch;
   }
   .amort-table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
-  .amort-table-wrap::-webkit-scrollbar-track { background: var(--surface-2); }
-  .amort-table-wrap::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+  .amort-table-wrap::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+  .amort-table-wrap::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
 
   table.amort { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 480px; }
   table.amort thead { position: sticky; top: 0; z-index: 2; }
@@ -336,7 +387,7 @@
   }
   table.amort td:first-child { text-align: left; color: var(--text); font-weight: 500; }
   table.amort tr.year-row td {
-    background: rgba(108,92,231,0.06); font-weight: 700;
+    background: var(--amort-highlight); font-weight: 700;
     color: var(--text); font-size: 13px;
   }
 
@@ -375,6 +426,60 @@
     gap: 24px;
   }
   .bottom-row > .card { margin-bottom: 0; }
+
+  /* Theme toggle */
+  .theme-toggle-wrap {
+    position: absolute;
+    top: 0; right: 0;
+  }
+  .header { position: relative; }
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    padding: 6px;
+    border-radius: 20px;
+  }
+  .theme-toggle-icon {
+    font-size: 16px;
+    line-height: 1;
+    transition: opacity 0.3s;
+  }
+  .theme-toggle-icon.dim { opacity: 0.35; }
+  .theme-toggle-track {
+    width: 48px;
+    height: 26px;
+    border-radius: 13px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    position: relative;
+    transition: background 0.3s, border-color 0.3s;
+    flex-shrink: 0;
+  }
+  .theme-toggle-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  [data-theme="light"] .theme-toggle-thumb {
+    transform: translateX(22px);
+  }
+  [data-theme="light"] .theme-toggle-track {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  [data-theme="light"] .theme-toggle-thumb {
+    background: #fff;
+  }
 
   /* Footer */
   .footer {
@@ -426,6 +531,7 @@
     .header { margin-bottom: 22px; }
     .header .badge { font-size: 10px; padding: 5px 12px; }
     .header p { font-size: 13px; }
+    .theme-toggle-wrap { position: relative; display: flex; justify-content: center; margin-bottom: 10px; }
 
     .card { padding: 18px 14px; border-radius: 12px; margin-bottom: 14px; }
     .card-title { font-size: 16px; margin-bottom: 16px; gap: 8px; }
@@ -488,6 +594,15 @@
 
 <div class="app">
   <div class="header">
+    <div class="theme-toggle-wrap">
+      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" role="button" tabindex="0">
+        <span class="theme-toggle-icon dim" id="moonIcon">🌙</span>
+        <div class="theme-toggle-track">
+          <div class="theme-toggle-thumb"></div>
+        </div>
+        <span class="theme-toggle-icon" id="sunIcon">☀️</span>
+      </div>
+    </div>
     <div class="badge">Clearpath</div>
     <h1>Mortgage Calculator</h1>
     <p>Estimate your monthly payments and see the full cost breakdown</p>
@@ -698,6 +813,48 @@
   let currentAmortView = 'yearly';
   let doughnutChart, areaChart;
 
+  // Theme
+  function isLight() { return document.documentElement.getAttribute('data-theme') === 'light'; }
+
+  function getChartColors() {
+    const s = getComputedStyle(document.documentElement);
+    return {
+      legend: s.getPropertyValue('--chart-legend').trim(),
+      tooltipBg: s.getPropertyValue('--chart-tooltip-bg').trim(),
+      tooltipBorder: s.getPropertyValue('--chart-tooltip-border').trim(),
+      grid: s.getPropertyValue('--chart-grid').trim(),
+      gridFaint: s.getPropertyValue('--chart-grid-faint').trim(),
+      tick: s.getPropertyValue('--chart-tick').trim(),
+    };
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isCurrentlyLight = html.getAttribute('data-theme') === 'light';
+    const newTheme = isCurrentlyLight ? 'dark' : 'light';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('clearpath-theme', newTheme);
+
+    // Update icon opacity
+    $('moonIcon').classList.toggle('dim', newTheme === 'light');
+    $('sunIcon').classList.toggle('dim', newTheme !== 'light');
+
+    // Re-render charts with new colors
+    if ($('resultsArea').style.display === 'flex') {
+      calculate();
+    }
+  }
+
+  // Load saved theme
+  (function() {
+    const saved = localStorage.getItem('clearpath-theme');
+    if (saved === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      $('moonIcon').classList.add('dim');
+      $('sunIcon').classList.remove('dim');
+    }
+  })();
+
   function toggleSection(id, el) {
     const content = $(id);
     const arrow = el.querySelector('.toggle-arrow');
@@ -801,6 +958,7 @@
     $('breakdownRows').innerHTML = bhtml;
 
     if (doughnutChart) doughnutChart.destroy();
+    const cc = getChartColors();
     doughnutChart = new Chart($('doughnutChart'), {
       type: 'doughnut',
       data: {
@@ -816,12 +974,14 @@
         plugins: {
           legend: {
             position: 'bottom',
-            labels: { color: '#7A839E', font: { family: 'DM Sans', size: 11 }, padding: 14, usePointStyle: true, pointStyleWidth: 10 }
+            labels: { color: cc.legend, font: { family: 'DM Sans', size: 11 }, padding: 14, usePointStyle: true, pointStyleWidth: 10 }
           },
           tooltip: {
-            backgroundColor: '#1A2035',
+            backgroundColor: cc.tooltipBg,
             titleFont: { family: 'DM Sans' }, bodyFont: { family: 'DM Sans' },
-            borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+            titleColor: isLight() ? '#1A1D2E' : '#E8ECF4',
+            bodyColor: isLight() ? '#1A1D2E' : '#E8ECF4',
+            borderColor: cc.tooltipBorder, borderWidth: 1,
             callbacks: { label: ctx => ` ${ctx.label}: ${fmtFull(ctx.parsed)}` }
           }
         },
@@ -844,6 +1004,7 @@
     }
 
     if (areaChart) areaChart.destroy();
+    const cc2 = getChartColors();
     areaChart = new Chart($('areaChart'), {
       type: 'bar',
       data: {
@@ -866,7 +1027,7 @@
             data: yearlyData.map(d => d.balance),
             type: 'line',
             borderColor: '#FD79A8',
-            backgroundColor: 'rgba(253,121,168,0.08)',
+            backgroundColor: isLight() ? 'rgba(253,121,168,0.06)' : 'rgba(253,121,168,0.08)',
             fill: true, tension: 0.4,
             pointRadius: 0, pointHoverRadius: 5,
             borderWidth: 2.5, yAxisID: 'y1', order: 1,
@@ -879,28 +1040,30 @@
         plugins: {
           legend: {
             position: 'top',
-            labels: { color: '#7A839E', font: { family: 'DM Sans', size: 11 }, usePointStyle: true, pointStyleWidth: 10, padding: 16 }
+            labels: { color: cc2.legend, font: { family: 'DM Sans', size: 11 }, usePointStyle: true, pointStyleWidth: 10, padding: 16 }
           },
           tooltip: {
-            backgroundColor: '#1A2035',
+            backgroundColor: cc2.tooltipBg,
             titleFont: { family: 'DM Sans' }, bodyFont: { family: 'DM Sans' },
-            borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+            titleColor: isLight() ? '#1A1D2E' : '#E8ECF4',
+            bodyColor: isLight() ? '#1A1D2E' : '#E8ECF4',
+            borderColor: cc2.tooltipBorder, borderWidth: 1,
             callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` }
           }
         },
         scales: {
           x: {
-            ticks: { color: '#4A5270', font: { family: 'DM Sans', size: 10 }, maxTicksLimit: 12 },
-            grid: { color: 'rgba(255,255,255,0.03)' },
+            ticks: { color: cc2.tick, font: { family: 'DM Sans', size: 10 }, maxTicksLimit: 12 },
+            grid: { color: cc2.gridFaint },
           },
           y: {
             position: 'left',
-            ticks: { color: '#4A5270', font: { family: 'DM Sans', size: 10 }, callback: v => fmt(v) },
-            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: { color: cc2.tick, font: { family: 'DM Sans', size: 10 }, callback: v => fmt(v) },
+            grid: { color: cc2.grid },
           },
           y1: {
             position: 'right',
-            ticks: { color: '#4A5270', font: { family: 'DM Sans', size: 10 }, callback: v => fmt(v) },
+            ticks: { color: cc2.tick, font: { family: 'DM Sans', size: 10 }, callback: v => fmt(v) },
             grid: { display: false },
           },
         }
