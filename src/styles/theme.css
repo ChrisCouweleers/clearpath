@@ -535,6 +535,117 @@ table.amort tr.year-row td {
 .fade-in-d3 { animation-delay: 0.3s; }
 .fade-in-d4 { animation-delay: 0.4s; }
 
+/* ========== EXTRA PRINCIPAL PAYMENT ========== */
+.extra-principal-card {
+  margin-bottom: 0;
+}
+.extra-principal-card .toggle-header {
+  border-top: none;
+  padding-top: 0;
+}
+.extra-principal-card .toggle-content.open {
+  max-height: 1200px;
+}
+
+.extra-results-area {
+  animation: fadeUp 0.4s ease both;
+}
+
+.extra-savings-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, rgba(0,184,148,0.1) 0%, rgba(0,206,201,0.08) 100%);
+  border: 1px solid rgba(0,184,148,0.2);
+  margin-bottom: 20px;
+}
+[data-theme="light"] .extra-savings-banner {
+  background: linear-gradient(135deg, rgba(0,184,148,0.08) 0%, rgba(0,206,201,0.05) 100%);
+  border-color: rgba(0,168,132,0.2);
+}
+.extra-savings-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.extra-savings-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.extra-savings-headline {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+.extra-savings-headline strong {
+  color: var(--green);
+  font-weight: 700;
+}
+.extra-savings-detail {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.extra-savings-detail strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.extra-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.extra-compare-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  text-align: center;
+}
+.extra-compare-card.highlight {
+  background: linear-gradient(135deg, rgba(0,184,148,0.08) 0%, rgba(0,206,201,0.05) 100%);
+  border-color: rgba(0,184,148,0.25);
+}
+.extra-compare-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.extra-compare-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.extra-compare-card.highlight .extra-compare-value {
+  color: var(--green);
+}
+.extra-compare-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.extra-compare-arrow {
+  font-size: 22px;
+  color: var(--green);
+  font-weight: 700;
+  text-align: center;
+}
+
+.extra-chart-wrap {
+  margin-top: 4px;
+}
+.extra-chart-wrap canvas {
+  max-height: 160px;
+}
+
 /* ========== TABLET ========== */
 @media (max-width: 768px) {
   .app { padding: 20px 16px 48px; }
@@ -554,6 +665,8 @@ table.amort tr.year-row td {
   .results-area { gap: 18px; }
   .nav-bar { gap: 6px; }
   .nav-link { padding: 8px 16px; font-size: 13px; }
+  .extra-compare-grid { grid-template-columns: 1fr; gap: 8px; }
+  .extra-compare-arrow { transform: rotate(90deg); }
 }
 
 /* ========== PHONE ========== */
@@ -598,6 +711,12 @@ table.amort tr.year-row td {
   table.amort td { padding: 9px 10px; }
   .results-area { gap: 14px; }
   .nav-link { padding: 8px 14px; font-size: 12px; }
+  .extra-savings-banner { padding: 14px 16px; gap: 12px; }
+  .extra-savings-icon { font-size: 24px; }
+  .extra-savings-headline { font-size: 14px; }
+  .extra-savings-detail { font-size: 12px; }
+  .extra-compare-value { font-size: 16px; }
+  .extra-compare-card { padding: 14px; }
 }
 
 /* ========== TINY PHONE ========== */
