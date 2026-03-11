@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement, LineController, BarController, Filler } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import StatCard from '../components/StatCard';
-import { fmt, fmtFull, monthNames, isLight, getChartColors } from '../utils/helpers';
+import { fmt, fmtFull, monthNames, fullMonthNames, isLight, getChartColors } from '../utils/helpers';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, BarController, PointElement, LineElement, LineController, Filler);
 
@@ -23,6 +23,11 @@ export default function AutoLoanCalc() {
   const [amortView, setAmortView] = useState('yearly');
   const [extraOpen, setExtraOpen] = useState(true);
   const [chartKey, setChartKey] = useState(0);
+
+  // Extra principal payment state
+  const [extraPrincipal, setExtraPrincipal] = useState(100);
+  const [extraPayOpen, setExtraPayOpen] = useState(false);
+  const [extraResults, setExtraResults] = useState(null);
 
   useEffect(() => {
     const observer = new MutationObserver(() => setChartKey(k => k + 1));
@@ -106,16 +111,75 @@ export default function AutoLoanCalc() {
     if (taxAmount > 0) breakdownItems.push({ name: 'Sales Tax', total: taxAmount, color: breakdownColors[2] });
     if (titleRegFees > 0) breakdownItems.push({ name: 'Fees', total: titleRegFees, color: breakdownColors[3] });
 
-    setResults({
+    const newResults = {
       monthlyPayment, loanAmount, totalLoanPayments, totalInterest,
       totalCost, taxAmount, titleRegFees, vehiclePrice, upfrontPayment,
       breakdownItems, amortData, yearlyData,
       loanTerm, interestRate, totalYears,
-    });
+      startMonth, startYear, monthlyRate,
+    };
+
+    setResults(newResults);
+    calculateExtra(newResults, extraPrincipal);
 
     if (window.innerWidth < 768) {
       setTimeout(() => document.getElementById('heroCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
     }
+  };
+
+  const calculateExtra = (res, extra) => {
+    if (!res || extra <= 0) {
+      setExtraResults(null);
+      return;
+    }
+
+    const { loanAmount, monthlyRate, monthlyPayment, startMonth, startYear, loanTerm, totalInterest } = res;
+    const n = loanTerm;
+
+    let balance = loanAmount;
+    let totalInterestWithExtra = 0;
+    let months = 0;
+
+    while (balance > 0 && months < n) {
+      months++;
+      const interestPmt = balance * monthlyRate;
+      const principalPmt = monthlyPayment - interestPmt + extra;
+      totalInterestWithExtra += interestPmt;
+      balance = Math.max(0, balance - principalPmt);
+      if (balance <= 0) break;
+    }
+
+    const interestSaved = totalInterest - totalInterestWithExtra;
+    const monthsSaved = n - months;
+    const yearsSaved = Math.floor(monthsSaved / 12);
+    const remainderMonths = monthsSaved % 12;
+
+    const endM = (startMonth + months) % 12;
+    const endY = startYear + Math.floor((startMonth + months) / 12);
+
+    // Original end date
+    const origEndM = (startMonth + n) % 12;
+    const origEndY = startYear + Math.floor((startMonth + n) / 12);
+
+    setExtraResults({
+      extraPrincipal: extra,
+      newMonths: months,
+      originalMonths: n,
+      monthsSaved,
+      yearsSaved,
+      remainderMonths,
+      interestSaved,
+      totalInterestWithExtra,
+      newEndMonth: endM,
+      newEndYear: endY,
+      origEndMonth: origEndM,
+      origEndYear: origEndY,
+    });
+  };
+
+  const handleExtraPrincipalChange = (val) => {
+    setExtraPrincipal(val);
+    if (results) calculateExtra(results, val);
   };
 
   useEffect(() => { calculate(); }, []);
@@ -277,7 +341,80 @@ export default function AutoLoanCalc() {
             </div>
           </div>
 
-          <div className="bottom-row fade-in fade-in-d3">
+          {/* Extra Principal Payment Section */}
+          <div className="card extra-principal-card fade-in fade-in-d3">
+            <div className="toggle-header" onClick={() => setExtraPayOpen(o => !o)} style={{ paddingTop: 0 }}>
+              <div className="card-title" style={{ marginBottom: 0 }}>
+                <div className="icon" style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--green)' }}>⚡</div>
+                Extra Principal Payment
+              </div>
+              <div className={`toggle-arrow${extraPayOpen ? ' open' : ''}`}>▼</div>
+            </div>
+            <div className={`toggle-content${extraPayOpen ? ' open' : ''}`} style={{ maxHeight: extraPayOpen ? '1200px' : '0' }}>
+              <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: '14px 0 18px', lineHeight: 1.6 }}>
+                See how much time and money you could save by making an additional principal payment each month.
+              </p>
+              <div style={{ maxWidth: 320, marginBottom: 18 }}>
+                <label className="form-label">Extra Monthly Payment</label>
+                <div className="input-wrap">
+                  <span className="input-prefix">$</span>
+                  <input
+                    type="number"
+                    value={extraPrincipal}
+                    onChange={e => handleExtraPrincipalChange(+e.target.value)}
+                    min="0"
+                    step="25"
+                    inputMode="numeric"
+                  />
+                  <span className="input-suffix">/mo</span>
+                </div>
+              </div>
+
+              {extraResults && extraResults.extraPrincipal > 0 && (
+                <div className="extra-results-area">
+                  <div className="extra-savings-banner">
+                    <div className="extra-savings-icon">🎉</div>
+                    <div className="extra-savings-text">
+                      <span className="extra-savings-headline">
+                        You'd save <strong>{fmt(extraResults.interestSaved)}</strong> in interest
+                      </span>
+                      <span className="extra-savings-detail">
+                        and pay off your auto loan <strong>
+                        {extraResults.yearsSaved > 0 && `${extraResults.yearsSaved} year${extraResults.yearsSaved !== 1 ? 's' : ''}`}
+                        {extraResults.yearsSaved > 0 && extraResults.remainderMonths > 0 && ', '}
+                        {extraResults.remainderMonths > 0 && `${extraResults.remainderMonths} month${extraResults.remainderMonths !== 1 ? 's' : ''}`}
+                        </strong> earlier
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="extra-compare-grid">
+                    <div className="extra-compare-card">
+                      <div className="extra-compare-label">Original Payoff</div>
+                      <div className="extra-compare-value">{fullMonthNames[extraResults.origEndMonth]} {extraResults.origEndYear}</div>
+                      <div className="extra-compare-sub">{extraResults.originalMonths} months · {fmt(results.totalInterest)} interest</div>
+                    </div>
+                    <div className="extra-compare-arrow">→</div>
+                    <div className="extra-compare-card highlight">
+                      <div className="extra-compare-label">New Payoff</div>
+                      <div className="extra-compare-value">{fullMonthNames[extraResults.newEndMonth]} {extraResults.newEndYear}</div>
+                      <div className="extra-compare-sub">{extraResults.newMonths} months · {fmt(extraResults.totalInterestWithExtra)} interest</div>
+                    </div>
+                  </div>
+
+                  <div className="extra-chart-wrap">
+                    <ExtraCompareChart
+                      key={`ec-${chartKey}-${extraResults.extraPrincipal}`}
+                      original={{ interest: results.totalInterest, months: extraResults.originalMonths }}
+                      withExtra={{ interest: extraResults.totalInterestWithExtra, months: extraResults.newMonths }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="bottom-row fade-in fade-in-d4">
             <div className="card" style={{ marginBottom: 0 }}>
               <div className="card-title" style={{ marginBottom: 4 }}>Balance Over Time</div>
               <div className="area-chart-wrap">
@@ -361,6 +498,60 @@ function BalanceChart({ data: yearlyData }) {
       }}
     />
   );
+}
+
+function ExtraCompareChart({ original, withExtra }) {
+  const cc = getChartColors();
+  const data = {
+    labels: ['Total Interest', 'Loan Duration'],
+    datasets: [
+      {
+        label: 'Original',
+        data: [original.interest, original.months],
+        backgroundColor: 'rgba(108,92,231,0.7)',
+        borderRadius: 4,
+      },
+      {
+        label: 'With Extra Payment',
+        data: [withExtra.interest, withExtra.months],
+        backgroundColor: 'rgba(0,184,148,0.7)',
+        borderRadius: 4,
+      },
+    ],
+  };
+  const options = {
+    responsive: true,
+    maintainAspectRatio: true,
+    indexAxis: 'y',
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { color: cc.legend, font: { family: 'DM Sans', size: 11 }, usePointStyle: true, pointStyleWidth: 10, padding: 16 },
+      },
+      tooltip: {
+        backgroundColor: cc.tooltipBg, titleColor: cc.textColor, bodyColor: cc.textColor,
+        titleFont: { family: 'DM Sans' }, bodyFont: { family: 'DM Sans' },
+        borderColor: cc.tooltipBorder, borderWidth: 1,
+        callbacks: {
+          label: ctx => {
+            if (ctx.dataIndex === 0) return ` ${ctx.dataset.label}: ${fmt(ctx.parsed.x)}`;
+            return ` ${ctx.dataset.label}: ${ctx.parsed.x} months`;
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: { color: cc.tick, font: { family: 'DM Sans', size: 10 }, callback: () => '' },
+        grid: { color: cc.gridFaint },
+      },
+      y: {
+        ticks: { color: cc.tick, font: { family: 'DM Sans', size: 11, weight: '500' } },
+        grid: { display: false },
+      },
+    },
+  };
+  return <Bar data={data} options={options} />;
 }
 
 function AmortTable({ data, view, totalYears }) {
